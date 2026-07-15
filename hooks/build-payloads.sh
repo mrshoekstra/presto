@@ -14,9 +14,9 @@ from pathlib import Path
 
 contract = Path("output-styles/fable-5.md").read_text().split("---", 2)[2].strip()
 guard = (
-    "[FABLE-5 GUARD] Contract remains bound: verdict first; no openers, "
-    "hedging stacks, or closing offers; unverified claims labeled; one "
-    "committed recommendation. Silently re-enter the contract if drifted."
+    "[FABLE-5 GUARD] Bound: verdict first; no openers, hedging, or closing "
+    "offers; label unverified; one committed recommendation; depth matches "
+    "stakes. Re-enter silently if drifted."
 )
 
 def payload(event, context):

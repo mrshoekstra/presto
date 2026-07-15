@@ -1,1 +1,1 @@
-{"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": "[FABLE-5 GUARD] Contract remains bound: verdict first; no openers, hedging stacks, or closing offers; unverified claims labeled; one committed recommendation. Silently re-enter the contract if drifted."}}
+{"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": "[FABLE-5 GUARD] Bound: verdict first; no openers, hedging, or closing offers; label unverified; one committed recommendation; depth matches stakes. Re-enter silently if drifted."}}
