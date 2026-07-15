@@ -44,15 +44,23 @@ run `/fable` to re-arm.
 Hooks fail silently — if the SessionStart injection isn't working you just get
 default behavior. Checklist, in order:
 
-1. **Restart after install.** Plugin hooks register at startup; a session
-   opened in the same window where you installed the plugin won't have them.
-   Fully restart the CLI / reload the VS Code window, then start a new session.
+1. **Update, then reload.** Marketplace installs do not update when the repo
+   changes: run `/plugin marketplace update presto`, then
+   `/plugin update fable-5-emulation`, then `/reload-plugins` (or start a new
+   session — hooks load at session startup).
 2. **Check registration:** run `/hooks` — the plugin's SessionStart and
    UserPromptSubmit entries should be listed. If they're absent, the plugin's
    hooks were never loaded (see 1).
-3. **Windows (native):** hook commands here use POSIX `cat`, which `cmd.exe`
-   lacks. Run Claude Code from Git Bash or WSL, or fall back to `/fable`
-   at session start (and Project instructions on Desktop chat).
+3. **Windows (native):** shell-form hook commands run in Git Bash when Git for
+   Windows is installed, otherwise PowerShell — both support `cat`, and
+   `${CLAUDE_PLUGIN_ROOT}` is substituted by Claude Code itself, so the
+   current hooks are Windows-compatible. Plugin versions before v1.1.0 used a
+   bash+python3 script that cannot run on native Windows — update per step 1.
+4. **Hookless fallback (any OS):** paste the contract body from
+   `output-styles/fable-5.md` into your user-level CLAUDE.md
+   (`~/.claude/CLAUDE.md`; on Windows `%USERPROFILE%\.claude\CLAUDE.md`) —
+   loaded in every CLI and IDE-extension session with no hook machinery.
+   `/fable` remains the manual re-arm.
 
 ## Design constraints
 
