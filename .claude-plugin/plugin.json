@@ -1,6 +1,6 @@
 {
   "name": "fable-5-emulation",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "Behavioral wrapper that replaces the default assistant register on Sonnet-class models with the Fable-5 cognitive framework: three-chamber reasoning, outcome-first structured output, zero-drift negative constraints, and strict factual-integrity rules.",
   "author": {
     "name": "mrshoekstra"
