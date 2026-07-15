@@ -8,7 +8,7 @@ A Claude Code plugin that replaces the default assistant register on Sonnet-clas
 | Component | Path | Role |
 |---|---|---|
 | Manifest | `.claude-plugin/plugin.json` | Plugin identity and metadata |
-| Behavioral contract | `output-styles/fable-5.md` | The core system-prompt payload (output style) |
+| Behavioral contract | `output-styles/fable-5.md` | The core payload: staged pipeline (intake tiering → precompute → generate → audit) with host-adaptive reasoning — native hidden channel where one exists, emitted `<thought_process>` block elsewhere |
 | Subagent | `agents/fable-architect.md` | Contract-bound specialist for design/decomposition tasks |
 | Zero-drift hooks | `hooks/hooks.json`, `hooks/payloads/` | Full contract on SessionStart; ~40-token guard on every prompt. Payloads are pre-built by `hooks/build-payloads.sh`; runtime is a bare `cat` |
 | Manual re-arm | `commands/fable.md` | `/fable` — recover from register drift mid-session |
