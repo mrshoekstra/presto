@@ -10,16 +10,49 @@ A Claude Code plugin that replaces the default assistant register on Sonnet-clas
 | Manifest | `.claude-plugin/plugin.json` | Plugin identity and metadata |
 | Behavioral contract | `output-styles/fable-5.md` | The core system-prompt payload (output style) |
 | Subagent | `agents/fable-architect.md` | Contract-bound specialist for design/decomposition tasks |
-| Zero-drift hooks | `hooks/hooks.json`, `hooks/inject-contract.sh` | Full contract on SessionStart; ~40-token guard on every prompt |
+| Zero-drift hooks | `hooks/hooks.json`, `hooks/payloads/` | Full contract on SessionStart; ~40-token guard on every prompt. Payloads are pre-built by `hooks/build-payloads.sh`; runtime is a bare `cat` |
 | Manual re-arm | `commands/fable.md` | `/fable` — recover from register drift mid-session |
 | API deployment | `docs/api-deployment.md` | Binding the contract via the Messages API with prompt caching |
 
 ## Installation
 
-Add this repository as a plugin source, install `fable-5-emulation`, then select
-the `Fable-5` output style (`/output-style fable-5`). The SessionStart hook also
-binds the contract automatically, so the framework is active even before the
-output style is selected.
+```
+/plugin marketplace add mrshoekstra/presto
+/plugin install fable-5-emulation@presto
+```
+
+## Activation by surface
+
+The contract has three binding mechanisms; which one applies depends on where
+you run Claude. Availability of `/output-style` is NOT required — the hooks
+are the primary binding.
+
+| Surface | Binding mechanism | Action needed after install |
+|---|---|---|
+| Claude Code CLI | Hooks (+ output style where supported) | None — SessionStart hook binds the contract in every new session |
+| VS Code / JetBrains extension | Hooks | None — same as CLI; `/fable` re-arms manually |
+| Claude Desktop / claude.ai chat | Project instructions | Plugins don't run here. Paste the body of `output-styles/fable-5.md` into a Project's custom instructions (or a custom Style) |
+| Direct Messages API | Cached system block | See `docs/api-deployment.md` |
+
+To verify the contract is bound, ask "what model are you?" — the reply should
+be verdict-first and name the real underlying model plus the framework. A
+"Great question!" opener or a "Let me know if…" closer means it is not bound;
+run `/fable` to re-arm.
+
+## Troubleshooting: hooks not firing
+
+Hooks fail silently — if the SessionStart injection isn't working you just get
+default behavior. Checklist, in order:
+
+1. **Restart after install.** Plugin hooks register at startup; a session
+   opened in the same window where you installed the plugin won't have them.
+   Fully restart the CLI / reload the VS Code window, then start a new session.
+2. **Check registration:** run `/hooks` — the plugin's SessionStart and
+   UserPromptSubmit entries should be listed. If they're absent, the plugin's
+   hooks were never loaded (see 1).
+3. **Windows (native):** hook commands here use POSIX `cat`, which `cmd.exe`
+   lacks. Run Claude Code from Git Bash or WSL, or fall back to `/fable`
+   at session start (and Project instructions on Desktop chat).
 
 ## Design constraints
 
