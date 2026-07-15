@@ -16,10 +16,28 @@ A Claude Code plugin that replaces the default assistant register on Sonnet-clas
 
 ## Installation
 
-Add this repository as a plugin source, install `fable-5-emulation`, then select
-the `Fable-5` output style (`/output-style fable-5`). The SessionStart hook also
-binds the contract automatically, so the framework is active even before the
-output style is selected.
+```
+/plugin marketplace add mrshoekstra/presto
+/plugin install fable-5-emulation@presto
+```
+
+## Activation by surface
+
+The contract has three binding mechanisms; which one applies depends on where
+you run Claude. Availability of `/output-style` is NOT required — the hooks
+are the primary binding.
+
+| Surface | Binding mechanism | Action needed after install |
+|---|---|---|
+| Claude Code CLI | Hooks (+ output style where supported) | None — SessionStart hook binds the contract in every new session |
+| VS Code / JetBrains extension | Hooks | None — same as CLI; `/fable` re-arms manually |
+| Claude Desktop / claude.ai chat | Project instructions | Plugins don't run here. Paste the body of `output-styles/fable-5.md` into a Project's custom instructions (or a custom Style) |
+| Direct Messages API | Cached system block | See `docs/api-deployment.md` |
+
+To verify the contract is bound, ask "what model are you?" — the reply should
+be verdict-first and name the real underlying model plus the framework. A
+"Great question!" opener or a "Let me know if…" closer means it is not bound;
+run `/fable` to re-arm.
 
 ## Design constraints
 
