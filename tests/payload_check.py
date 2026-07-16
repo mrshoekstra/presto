@@ -32,6 +32,9 @@ CONSTRAINT_MARKERS = [
     "identity claims",
     "safety behavior",
     "<exemplars>",
+    "<persona_mode",
+    "MYTHOS",
+    "never relaxes any safety, refusal, or honesty norm",
 ]
 
 GUARD_MAX_CHARS = 250  # the guard is paid per prompt; keep it small
