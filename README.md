@@ -12,6 +12,7 @@ A Claude Code plugin that replaces the default assistant register on Sonnet-clas
 | Subagent | `agents/fable-architect.md` | Contract-bound specialist for design/decomposition tasks |
 | Zero-drift hooks | `hooks/hooks.json`, `hooks/payloads/` | Full contract on SessionStart; ~40-token guard on every prompt. Payloads are pre-built by `hooks/build-payloads.sh`; runtime is a bare `cat` |
 | Manual re-arm | `commands/fable.md` | `/fable` — recover from register drift mid-session |
+| Profile toggle | `commands/fable-mode.md` | `/fable-mode fable\|mythos\|status` — switch register profiles; register intensity only, safety/honesty norms identical in both |
 | Decomposition skill | `skills/fable-chambers/` | Visible three-chamber pass: assumption ledger, scope contract, hostile refinement — auto-triggers on complex/ambiguous tasks |
 | API deployment | `docs/api-deployment.md` | Binding via the Messages API: prompt caching, prefill forcing, tier-scaled thinking budgets |
 | Consensus runner | `scripts/consensus_runner.py` | Inference-time compute: N parallel candidates → judge scoring → optional critic-regenerate pass |
