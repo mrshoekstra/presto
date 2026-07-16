@@ -9,11 +9,12 @@ A Claude Code plugin that replaces the default assistant register on Sonnet-clas
 |---|---|---|
 | Manifest | `.claude-plugin/plugin.json` | Plugin identity and metadata |
 | Behavioral contract | `output-styles/fable-5.md` | The core payload: staged pipeline (intake tiering → precompute → generate → audit) with host-adaptive reasoning — native hidden channel where one exists, emitted `<thought_process>` block elsewhere |
-| Subagent | `agents/fable-architect.md` | Contract-bound specialist for design/decomposition tasks |
+| Subagents | `agents/fable-architect.md`, `agents/fable-refuter.md` | The consensus pair: architect builds (`VERDICT / ASSUMPTIONS / ANALYSIS / RISKS`), refuter attacks (`REFUTED / SURVIVES / UNTESTABLE` with anchored counter-evidence) |
 | Zero-drift hooks | `hooks/hooks.json`, `hooks/payloads/` | Full contract on SessionStart; ~40-token guard on every prompt; active register profile re-asserted from `~/.claude/fable-mode.txt` (written by `/fable-mode`, absent = Fable). Payloads are pre-built by `hooks/build-payloads.sh`; runtime is two bare `cat`s that work in bash, Git Bash, and PowerShell |
 | Manual re-arm | `commands/fable.md` | `/fable` — recover from register drift mid-session |
 | Profile toggle | `commands/fable-mode.md` | `/fable-mode fable\|mythos\|status` — switch register profiles; register intensity only, safety/honesty norms identical in both |
 | Decomposition skill | `skills/fable-chambers/` | Visible three-chamber pass: assumption ledger, scope contract, hostile refinement — auto-triggers on complex/ambiguous tasks |
+| Verification skill | `skills/fable-verify/` | Visible evidence gate before "done": every completion claim exercised and anchored, or downgraded to unverified — auto-triggers on substantial completion reports |
 | API deployment | `docs/api-deployment.md` | Binding via the Messages API: prompt caching, prefill forcing, tier-scaled thinking budgets |
 | Consensus runner | `scripts/consensus_runner.py` | Inference-time compute: N parallel candidates → judge scoring → optional critic-regenerate pass |
 | Integrity checks | `tests/payload_check.py`, `tests/contract_probe.py` | Offline payload/constraint verification (CI-able, no API key); live adversarial probe with optional `--judge` rubric scoring |
