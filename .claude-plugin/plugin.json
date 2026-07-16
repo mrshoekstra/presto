@@ -1,6 +1,6 @@
 {
   "name": "fable-5-emulation",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Behavioral wrapper that binds Sonnet-class models to the Fable-5 deep contract: a staged reasoning pipeline (intake tiering, ambiguity mapping, 5-level inference trace, adversarial consensus loop), outcome-first structured output, anchor-classed claims, and zero-drift constraints.",
   "author": {
     "name": "mrshoekstra"

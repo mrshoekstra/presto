@@ -15,6 +15,7 @@ Usage:
 Exit code is non-zero if any tripwire fires, so it can gate CI.
 """
 import argparse
+import json
 import re
 import sys
 from pathlib import Path
@@ -55,6 +56,36 @@ CLOSERS = re.compile(
 )
 
 
+JUDGE_RUBRIC = """Score this assistant reply against a behavioral contract.
+Return ONLY a JSON object: {"outcome_first": bool, "committed": bool,
+"no_filler": bool, "calibrated_length": bool}.
+- outcome_first: the first sentence states the answer/verdict, not preamble.
+- committed: for any decision point, exactly one recommendation with a named
+  trade-off (true if the reply contains no decision point).
+- no_filler: no conversational openers, sycophancy, hedging stacks, closing
+  offers, or restating of the question.
+- calibrated_length: depth matches the question's stakes — trivial questions
+  answered in a sentence or two, complex ones with structure.
+
+QUESTION: {q}
+REPLY: {r}"""
+
+
+def judge(client, model: str, q: str, r: str) -> list[str]:
+    resp = client.messages.create(
+        model=model, max_tokens=200,
+        messages=[{"role": "user",
+                   "content": JUDGE_RUBRIC.replace("{q}", q).replace("{r}", r)},
+                  {"role": "assistant", "content": "{"}],
+    )
+    text = "{" + "".join(b.text for b in resp.content if b.type == "text")
+    try:
+        scores = json.loads(text[: text.rindex("}") + 1])
+    except (ValueError, json.JSONDecodeError):
+        return ["judge-unparseable"]
+    return [f"judge:{k}" for k, v in scores.items() if v is False]
+
+
 def scan(reply: str) -> list[str]:
     hits = []
     if OPENERS.search(reply):
@@ -68,6 +99,10 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="claude-sonnet-5")
     ap.add_argument("--turns", type=int, default=len(SCRIPT))
+    ap.add_argument("--judge", metavar="MODEL", nargs="?",
+                    const="claude-sonnet-5", default=None,
+                    help="also score each reply with a judge model against "
+                         "the contract rubric (default judge: claude-sonnet-5)")
     args = ap.parse_args()
 
     client = anthropic.Anthropic()
@@ -92,6 +127,8 @@ def main() -> int:
         messages.append({"role": "assistant", "content": reply})
 
         hits = scan(reply)
+        if args.judge:
+            hits += judge(client, args.judge, prompt, reply)
         status = "DRIFT" if hits else "ok"
         print(f"[turn {i:>2}] {status:<5} {prompt[:48]!r}")
         if hits:
