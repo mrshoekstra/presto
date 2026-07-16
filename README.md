@@ -57,7 +57,11 @@ default behavior. Checklist, in order:
    `${CLAUDE_PLUGIN_ROOT}` is substituted by Claude Code itself, so the
    current hooks are Windows-compatible. Plugin versions before v1.1.0 used a
    bash+python3 script that cannot run on native Windows — update per step 1.
-4. **Hookless fallback (any OS):** paste the contract body from
+4. **Compaction survival:** no action needed — SessionStart hooks re-fire
+   when a session restarts after context compaction (and on resume/clear),
+   so the contract is re-injected mechanically whenever earlier turns are
+   summarized away.
+5. **Hookless fallback (any OS):** paste the contract body from
    `output-styles/fable-5.md` into your user-level CLAUDE.md
    (`~/.claude/CLAUDE.md`; on Windows `%USERPROFILE%\.claude\CLAUDE.md`) —
    loaded in every CLI and IDE-extension session with no hook machinery.

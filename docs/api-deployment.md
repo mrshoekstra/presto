@@ -37,4 +37,17 @@ Deployment rules:
    `hooks/payloads/guard.json`) to the latest user turn every 10–15 turns.
    Do not re-send the full contract mid-conversation.
 4. **Temperature ceiling:** above ~0.5 the negative constraints start leaking
-   (openers reappear first). 0.0–0.3 is the validated band.
+   (openers reappear first). 0.0–0.3 is the validated band for single-shot
+   calls (the consensus runner deliberately samples hotter, then judges).
+5. **Prefill forcing (models without native hidden reasoning):** make the
+   S2 pipeline stage structurally unavoidable by prefilling the assistant
+   turn — append `{"role": "assistant", "content": "<thought_process>\nTIER:"}`
+   to `messages`. The model must complete the precompute block before it can
+   reach answer text. Strip everything through `</thought_process>` before
+   display.
+6. **Extended thinking (Claude models):** map the intake tier to a real
+   thinking budget instead of the default — e.g. T0: thinking off,
+   T1: `{"type": "enabled", "budget_tokens": 4000}`, T2: 16000+. With
+   thinking enabled, omit the prefill (S2 runs in the native channel) and
+   note the API requires temperature 1 with thinking on — the judge stage
+   below replaces the low-temperature stability lever.
