@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cat \"${CLAUDE_PLUGIN_ROOT}/hooks/payloads/session.json\""
+            "command": "cat \"${HOME}/.claude/fable-mode.txt\"; cat \"${CLAUDE_PLUGIN_ROOT}/hooks/payloads/session.txt\""
           }
         ]
       }
@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cat \"${CLAUDE_PLUGIN_ROOT}/hooks/payloads/guard.json\""
+            "command": "cat \"${HOME}/.claude/fable-mode.txt\"; cat \"${CLAUDE_PLUGIN_ROOT}/hooks/payloads/guard.txt\""
           }
         ]
       }

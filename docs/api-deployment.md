@@ -34,7 +34,8 @@ Deployment rules:
 2. **Never paraphrase the contract per-request.** Byte-identical text is what
    makes the cache hit; paraphrases also introduce drift between environments.
 3. **Long conversations:** re-anchor by appending the guard line (see
-   `hooks/payloads/guard.json`) to the latest user turn every 10–15 turns.
+   `hooks/payloads/guard.txt`, plus the active `mode-*.txt` payload if
+   running the Mythos profile) to the latest user turn every 10–15 turns.
    Do not re-send the full contract mid-conversation.
 4. **Temperature ceiling:** above ~0.5 the negative constraints start leaking
    (openers reappear first). 0.0–0.3 is the validated band for single-shot
