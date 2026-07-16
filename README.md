@@ -10,7 +10,7 @@ A Claude Code plugin that replaces the default assistant register on Sonnet-clas
 | Manifest | `.claude-plugin/plugin.json` | Plugin identity and metadata |
 | Behavioral contract | `output-styles/fable-5.md` | The core payload: staged pipeline (intake tiering → precompute → generate → audit) with host-adaptive reasoning — native hidden channel where one exists, emitted `<thought_process>` block elsewhere |
 | Subagent | `agents/fable-architect.md` | Contract-bound specialist for design/decomposition tasks |
-| Zero-drift hooks | `hooks/hooks.json`, `hooks/payloads/` | Full contract on SessionStart; ~40-token guard on every prompt. Payloads are pre-built by `hooks/build-payloads.sh`; runtime is a bare `cat` |
+| Zero-drift hooks | `hooks/hooks.json`, `hooks/payloads/` | Full contract on SessionStart; ~40-token guard on every prompt; active register profile re-asserted from `~/.claude/fable-mode.txt` (written by `/fable-mode`, absent = Fable). Payloads are pre-built by `hooks/build-payloads.sh`; runtime is two bare `cat`s that work in bash, Git Bash, and PowerShell |
 | Manual re-arm | `commands/fable.md` | `/fable` — recover from register drift mid-session |
 | Profile toggle | `commands/fable-mode.md` | `/fable-mode fable\|mythos\|status` — switch register profiles; register intensity only, safety/honesty norms identical in both |
 | Decomposition skill | `skills/fable-chambers/` | Visible three-chamber pass: assumption ledger, scope contract, hostile refinement — auto-triggers on complex/ambiguous tasks |

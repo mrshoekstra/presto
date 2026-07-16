@@ -37,7 +37,8 @@ CONSTRAINT_MARKERS = [
     "never relaxes any safety, refusal, or honesty norm",
 ]
 
-GUARD_MAX_CHARS = 250  # the guard is paid per prompt; keep it small
+GUARD_MAX_CHARS = 250   # the guard is paid per prompt; keep it small
+MODE_MAX_CHARS = 500    # mode payloads are also paid per prompt when active
 
 
 def fail(msg: str) -> None:
@@ -49,30 +50,36 @@ fail.count = 0
 
 
 def main() -> int:
-    session = json.loads((ROOT / "hooks/payloads/session.json").read_text())
-    guard = json.loads((ROOT / "hooks/payloads/guard.json").read_text())
-    hooks = json.loads((ROOT / "hooks/hooks.json").read_text())
+    payloads = ROOT / "hooks/payloads"
     contract = (ROOT / "output-styles/fable-5.md").read_text().split("---", 2)[2].strip()
 
-    ctx = session["hookSpecificOutput"]["additionalContext"]
-    if session["hookSpecificOutput"]["hookEventName"] != "SessionStart":
-        fail("session payload has wrong hookEventName")
-    if guard["hookSpecificOutput"]["hookEventName"] != "UserPromptSubmit":
-        fail("guard payload has wrong hookEventName")
+    session = (payloads / "session.txt").read_text().strip()
+    guard = (payloads / "guard.txt").read_text().strip()
+    mode_fable = (payloads / "mode-fable.txt").read_text().strip()
+    mode_mythos = (payloads / "mode-mythos.txt").read_text().strip()
 
-    if ctx != contract:
+    if session != contract:
         fail("session payload out of sync with output-styles/fable-5.md — "
              "run hooks/build-payloads.sh")
 
-    glen = len(guard["hookSpecificOutput"]["additionalContext"])
-    if glen > GUARD_MAX_CHARS:
-        fail(f"guard payload {glen} chars exceeds budget of {GUARD_MAX_CHARS}")
+    if len(guard) > GUARD_MAX_CHARS:
+        fail(f"guard payload {len(guard)} chars exceeds budget of {GUARD_MAX_CHARS}")
 
-    lower = ctx.lower()
+    for name, mode in (("mode-fable", mode_fable), ("mode-mythos", mode_mythos)):
+        if len(mode) > MODE_MAX_CHARS:
+            fail(f"{name} payload {len(mode)} chars exceeds budget of {MODE_MAX_CHARS}")
+        if not mode.startswith("[FABLE-5 MODE]"):
+            fail(f"{name} payload missing [FABLE-5 MODE] prefix")
+
+    if "safety/refusal/honesty norms are unchanged" not in mode_mythos.replace("\n", " "):
+        fail("mode-mythos payload missing the safety-unchanged clause")
+
+    lower = contract.lower()
     for marker in CONSTRAINT_MARKERS:
         if marker.lower() not in lower:
             fail(f"constraint family missing from contract: {marker!r}")
 
+    hooks = json.loads((ROOT / "hooks/hooks.json").read_text())
     for event, entries in hooks["hooks"].items():
         for entry in entries:
             for h in entry["hooks"]:
@@ -81,11 +88,14 @@ def main() -> int:
                         rel = token.removeprefix("${CLAUDE_PLUGIN_ROOT}/")
                         if not (ROOT / rel).exists():
                             fail(f"{event} hook references missing file: {rel}")
+                # The ${HOME}/.claude/fable-mode.txt reference is runtime
+                # user state and intentionally optional — not checked here.
 
     if fail.count:
         print(f"\n{fail.count} check(s) failed")
         return 1
-    print(f"all checks passed (contract {len(ctx)} chars, guard {glen} chars)")
+    print(f"all checks passed (contract {len(contract)} chars, guard {len(guard)} chars, "
+          f"mode payloads {len(mode_fable)}/{len(mode_mythos)} chars)")
     return 0
 
 
